@@ -2,11 +2,11 @@ package com.mjanglin.http;
 
 public class HttpParsingException extends Exception {
     
-    private HttpStatusCode errorCode;
+    private final HttpStatusCode errorCode;
     
-    public HttpParsingException(HttpStatusCode errorCode) {
-        super(errorCode.MESSAGE);
-        this.errorCode = errorCode;
+    public HttpParsingException(HttpStatusCode code) {
+        super(code.MESSAGE);
+        this.errorCode = code;
     }
 
     public HttpStatusCode getErrorCode() {

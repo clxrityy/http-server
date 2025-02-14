@@ -1,5 +1,7 @@
 package com.mjanglin.httpserver.util;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -7,10 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import java.io.IOException;
-
 public class Json {
-    private static ObjectMapper objectMapper = defaulObjectMapper();
+    private static final ObjectMapper objectMapper = defaulObjectMapper();
 
     private static ObjectMapper defaulObjectMapper() {
         ObjectMapper om = new ObjectMapper();

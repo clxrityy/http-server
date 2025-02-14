@@ -1,5 +1,8 @@
 package com.mjanglin.httpserver;
 
+
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +26,7 @@ public class Main {
         try {
             ServerListenerThread serverListenerThread = new ServerListenerThread(config.getPort(), config.getWebroot());
             serverListenerThread.start();
-        } catch (Exception e) {
+        } catch (IOException e) {
             LOGGER.error("Problem with starting server", e);
         }
     }

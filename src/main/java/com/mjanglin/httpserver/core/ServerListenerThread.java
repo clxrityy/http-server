@@ -11,9 +11,9 @@ public class ServerListenerThread extends Thread {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ServerListenerThread.class);
 
-    private int port;
-    private String webroot;
-    private ServerSocket serverSocket;
+    private final int port;
+    private final String webroot;
+    private final ServerSocket serverSocket;
 
     public ServerListenerThread(int prt, String wr) throws IOException {
         this.port = prt;
@@ -22,6 +22,7 @@ public class ServerListenerThread extends Thread {
     }
 
     @Override
+    @SuppressWarnings("CallToPrintStackTrace")
     public void run() {
         try {
             while (serverSocket.isBound() && !serverSocket.isClosed()) {

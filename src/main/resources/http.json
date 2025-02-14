@@ -1,4 +1,4 @@
 {
-    "port": 8080,
-    "webroot": "/tmp"
+    "port": 5006,
+    "webroot": "root"
 }

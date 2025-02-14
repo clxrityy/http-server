@@ -1,6 +1,7 @@
 package com.mjanglin.httpserver.core;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -10,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 public class HttpConnectionWorker extends Thread {
 
-    private Socket socket;
+    private final Socket socket;
     private final static Logger LOGGER = LoggerFactory.getLogger(HttpConnectionWorker.class);
 
     public HttpConnectionWorker(Socket socket) {
@@ -52,17 +53,17 @@ public class HttpConnectionWorker extends Thread {
 
             try {
                 sleep(5000);
-            } catch (Exception e) {
+            } catch (InterruptedException e) {
                 LOGGER.error("Problem with sleep", e);
             }
             LOGGER.info("Connection process finished.");
-        } catch (Exception e) {
+        } catch (IOException e) {
             LOGGER.error("Problem with communication", e);
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
-                } catch (Exception e) {
+                } catch (IOException e) {
                     LOGGER.error("Problem with closing reader", e);
                 }
             }
@@ -73,7 +74,7 @@ public class HttpConnectionWorker extends Thread {
             if (socket != null) {
                 try {
                     socket.close();
-                } catch (Exception e) {
+                } catch (IOException e) {
                     LOGGER.error("Problem with closing socket", e);
                 }
             }
