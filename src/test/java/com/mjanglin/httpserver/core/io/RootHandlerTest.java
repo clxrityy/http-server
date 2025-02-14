@@ -35,7 +35,7 @@ public class RootHandlerTest {
     @Test
     void constructorGoodPath() {
         try {
-            RootHandler rootHandler = new RootHandler("/root");
+            RootHandler rootHandler = new RootHandler("root");
         } catch (RootNotFoundException e) {
             fail(e);
         }
