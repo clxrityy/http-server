@@ -38,7 +38,7 @@ public class ConfigManager {
             throw new HttpConfigExeception(e);
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         int i;
 

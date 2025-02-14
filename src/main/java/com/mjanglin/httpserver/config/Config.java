@@ -2,21 +2,21 @@ package com.mjanglin.httpserver.config;
 
 public class Config {
     private int port;
-    private String webroot;
+    private String root;
 
     public int getPort() {
         return port;
     }
 
-    public String getWebroot() {
-        return webroot;
+    public String getRoot() {
+        return root;
     }
 
     public void setPort(int port) {
         this.port = port;
     }
 
-    public void setWebroot(String webroot) {
-        this.webroot = webroot;
+    public void setRoot(String webroot) {
+        this.root = webroot;
     }
 }

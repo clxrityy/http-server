@@ -7,6 +7,8 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mjanglin.httpserver.core.io.RootNotFoundException;
+
 public class ServerListenerThread extends Thread {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ServerListenerThread.class);
@@ -14,11 +16,13 @@ public class ServerListenerThread extends Thread {
     private final int port;
     private final String webroot;
     private final ServerSocket serverSocket;
+    // private final RootHandler rootHandler;
 
-    public ServerListenerThread(int prt, String wr) throws IOException {
+    public ServerListenerThread(int prt, String wr) throws IOException, RootNotFoundException {
         this.port = prt;
         this.webroot = wr;
         this.serverSocket = new ServerSocket(this.port);
+        // this.rootHandler = new RootHandler(this.webroot);
     }
 
     @Override

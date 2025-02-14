@@ -7,7 +7,11 @@ A simple Java HTTP server
 - [x] JSON configuration management
 - [x] HTTP server connection socket
 - [x] HTTP server-to-client listener thread
-- [x] Support for HTML files
+- [ ] Support for file types
+    - [ ] Support for CSS files
+    - [ ] Support for JS files
+    - [x] Support for HTML files
+    - [x] Support for image files
 - [ ] Support for routes
 - [ ] Support for different HTTP methods
 - [ ] Handle requests

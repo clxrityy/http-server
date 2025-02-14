@@ -9,25 +9,22 @@ import org.slf4j.LoggerFactory;
 import com.mjanglin.httpserver.config.Config;
 import com.mjanglin.httpserver.config.ConfigManager;
 import com.mjanglin.httpserver.core.ServerListenerThread;
+import com.mjanglin.httpserver.core.io.RootNotFoundException;
 
 public class Main {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, RootNotFoundException {
         LOGGER.info("Server starting...");
 
         ConfigManager.getInstance().loadConfig("src/main/resources/http.json");
         Config config = ConfigManager.getInstance().getCurrentConfig();
 
         LOGGER.info("Using port: " + config.getPort());
-        LOGGER.info("Using webroot: " + config.getWebroot());
+        LOGGER.info("Using webroot: " + config.getRoot());
 
-        try {
-            ServerListenerThread serverListenerThread = new ServerListenerThread(config.getPort(), config.getWebroot());
-            serverListenerThread.start();
-        } catch (IOException e) {
-            LOGGER.error("Problem with starting server", e);
-        }
+        ServerListenerThread serverListenerThread = new ServerListenerThread(config.getPort(), config.getRoot());
+        serverListenerThread.start();
     }
 }
