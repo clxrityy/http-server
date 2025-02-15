@@ -28,6 +28,13 @@ public class HttpConnectionWorker extends Thread {
                 "\r\n" +
                 content;
         out.write(response.getBytes());
+
+        File notFoundPage = new File("root", "404.html");
+        if (notFoundPage.exists()) {
+            sendFileResponse(out, "404 Not Found", notFoundPage, "text/html");
+        } else {
+            sendResponse(out, "404 Not Found", "<h1>404 Not Found</h1>");
+        }
     }
 
     private void sendFileResponse(OutputStream out, String status, File file, String contentType) throws IOException {
@@ -35,9 +42,11 @@ public class HttpConnectionWorker extends Thread {
         String headers = "HTTP/1.1 " + status + "\r\n" +
                 "Content-Type: " + contentType + "\r\n" +
                 "Content-Length: " + fileData.length + "\r\n" +
+                "Cache-Control: max-age=3600\r\n" +
                 "\r\n";
         out.write(headers.getBytes());
         out.write(fileData);
+        LOGGER.info("Sent file: " + file.getAbsolutePath() + " (" + contentType + ")");
     }
 
     private byte[] readFileToBytes(File file) throws IOException {
@@ -52,68 +61,47 @@ public class HttpConnectionWorker extends Thread {
         }
     }
 
+
+    private String getContentType(String fileName) {
+        if (fileName.endsWith(".html")) {
+            return "text/html";
+        } else if (fileName.endsWith(".css")) {
+            return "text/css";
+        } else if (fileName.endsWith(".js")) {
+            return "application/javascript";
+        } else if (fileName.endsWith(".png")) {
+            return "image/png";
+        } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+            return "image/jpeg";
+        } else if (fileName.endsWith(".gif")) {
+            return "image/gif";
+        } else if (fileName.endsWith(".txt")) {
+            return "text/plain";
+        } else if (fileName.endsWith(".json")) {
+            return "application/json";
+        } else if (fileName.endsWith(".svg")) {
+            return "image/svg+xml";
+        } else if (fileName.endsWith(".xml")) {
+            return "application/xml";
+        } else if (fileName.endsWith(".pdf")) {
+            return "application/pdf";
+        } else if (fileName.endsWith(".zip")) {
+            return "application/zip";
+        } else if (fileName.endsWith(".mp4")) {
+            return "video/mp4";
+        } else if (fileName.endsWith(".mp3")) {
+            return "audio/mpeg";
+        } else if (fileName.endsWith(".woff")) {
+            return "font/woff";
+        } else if (fileName.endsWith(".woff2")) {
+            return "font/woff2";
+        } else {
+            return "application/octet-stream"; // Default binary type
+        }
+    }    
+
     @Override
     public void run() {
-
-        // BufferedReader reader = null;
-        // PrintWriter writer = null;
-
-        // try {
-        //     reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        //     writer = new PrintWriter(socket.getOutputStream(), true);
-
-        //     int _byte;
-        //     while ((_byte = reader.read()) >= 0) {
-        //         System.out.print((char) _byte);
-        //     }
-
-        //     while (true) {
-        //         String line = reader.readLine();
-        //         LOGGER.info("HEADER: " + line);
-        //         if (line.equals("")) {
-        //             break;
-        //         }
-        //         if (line.contains("GET")) {
-        //             writer.println("HTTP/1.1 200 OK");
-        //             writer.println("Content-Type: text/html");
-        //             writer.println();
-        //             writer.println("<title>Java HTTP Server</title>");
-        //             writer.println();
-        //             writer.println("<h1>Hello from Java HTTP Server</h1>");
-        //             writer.flush();
-        //             break;
-        //         }
-        //     }
-
-        //     try {
-        //         sleep(5000);
-        //     } catch (InterruptedException e) {
-        //         LOGGER.error("Problem with sleep", e);
-        //     }
-        //     LOGGER.info("Connection process finished.");
-        // } catch (IOException e) {
-        //     LOGGER.error("Problem with communication", e);
-        // } finally {
-        //     if (reader != null) {
-        //         try {
-        //             reader.close();
-        //         } catch (IOException e) {
-        //             LOGGER.error("Problem with closing reader", e);
-        //         }
-        //     }
-        //     if (writer != null) {
-        //         writer.close();
-        //     }
-
-        //     if (socket != null) {
-        //         try {
-        //             socket.close();
-        //         } catch (IOException e) {
-        //             LOGGER.error("Problem with closing socket", e);
-        //         }
-        //     }
-        // }
-
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              OutputStream out = socket.getOutputStream()) {
@@ -133,7 +121,7 @@ public class HttpConnectionWorker extends Thread {
 
             String requestedFile = requestParts[1]; // e.g., "/index.html"
             if (requestedFile.equals("/")) {
-                requestedFile = "/index.html"; // Default to index.html
+                requestedFile += "/index.html"; // Default to index.html
             }
 
             // Consume the rest of the headers
@@ -144,7 +132,11 @@ public class HttpConnectionWorker extends Thread {
             File file = new File("root", requestedFile);
 
             if (file.exists() && !file.isDirectory()) {
-                sendFileResponse(out, "200 OK", file, "text/html");
+
+                // Determine Content-Type
+                String contentType = getContentType(requestedFile);
+                LOGGER.info("Serving file: " + requestedFile + " with content type: " + contentType);
+                sendFileResponse(out, "200 OK", file, contentType);
             } else {
                 sendResponse(out, "404 Not Found", "<h1>404 Not Found</h1>");
             }

@@ -22,9 +22,11 @@ public class Main {
         Config config = ConfigManager.getInstance().getCurrentConfig();
 
         LOGGER.info("Using port: " + config.getPort());
-        LOGGER.info("Using webroot: " + config.getRoot());
+        LOGGER.info("Using root: " + config.getRoot());
+        LOGGER.info("Live at: http://localhost:" + config.getPort());
 
         ServerListenerThread serverListenerThread = new ServerListenerThread(config.getPort(), config.getRoot());
         serverListenerThread.start();
+
     }
 }
