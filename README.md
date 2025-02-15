@@ -19,6 +19,7 @@ A simple Java HTTP server
 - [x] Parsing headers of requests
 - [ ] Parsing body of requests
 - [ ] Parsing query parameters of requests
+- [x] Thread pool support
 
 ## Usage
 
