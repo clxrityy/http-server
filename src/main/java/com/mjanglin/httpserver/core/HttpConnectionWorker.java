@@ -124,12 +124,20 @@ public class HttpConnectionWorker extends Thread {
                 requestedFile += "/index.html"; // Default to index.html
             }
 
+            // Normalize the requested file path
+            File rootDir = new File("root");
+            File file = new File(rootDir, requestedFile).getCanonicalFile();
+
+            // Ensure the file is within the root directory
+            if (!file.getPath().startsWith(rootDir.getCanonicalPath() + File.separator)) {
+                sendResponse(out, "HTTP/1.1 400 Bad Request", "Invalid file path.");
+                return;
+            }
+
             // Consume the rest of the headers
             while (!reader.readLine().isEmpty()) {
                 // Just read and discard headers
             }
-
-            File file = new File("root", requestedFile);
 
             if (file.exists() && !file.isDirectory()) {
 
