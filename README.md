@@ -2,6 +2,18 @@
 
 A simple Java HTTP server
 
+## Usage
+
+The files in [`root/`](/root/) will be served by the server.
+
+- Simply run the `http-server.jar` file
+    ```zsh
+    java -jar http-server.jar
+    ```
+    - The server will start on port 5006 by default ([`http://localhost:5006`](http://localhost:5006))
+    - The server will serve files from the `root` directory by default
+    - The server will use the `http.json` file by default
+
 ## Features
 
 - [x] JSON configuration management
@@ -14,22 +26,14 @@ A simple Java HTTP server
     - [x] Support for image files
 - [ ] Support for routes
 - [ ] Support for different HTTP methods
+    - [x] GET
+    - [ ] POST
+    - [ ] PUT
+    - [ ] DELETE
+    - [ ] PATCH
 - [ ] Handle requests
 - [x] Passing tests
 - [x] Parsing headers of requests
 - [ ] Parsing body of requests
 - [ ] Parsing query parameters of requests
 - [x] Thread pool support
-
-## Usage
-
-The files in [`root/`](/root/) will be served by the server.
-
-- Simply run the `http-server.jar` file
-    ```zsh
-    java -jar http-server.jar
-    ```
-    - The server will start on port 5006 by default
-    - The server will serve files from the `root` directory by default
-    - The server will use the `http.json` file by default
-    

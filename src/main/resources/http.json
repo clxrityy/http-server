@@ -1,4 +1,4 @@
 {
     "port": 5006,
-    "webroot": "root"
+    "root": "root"
 }
