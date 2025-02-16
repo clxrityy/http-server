@@ -29,7 +29,7 @@ public final class ServerListenerThread extends Thread {
 
     public ServerListenerThread(int prt, String wr) throws IOException, RootNotFoundException {
         // if (wr == null) {
-            
+
         // }
 
         this.port = prt;
@@ -60,19 +60,55 @@ public final class ServerListenerThread extends Thread {
         }));
     }
 
-    private void setupRoutes() {
-        router.addRoute("/", "GET", (reader, writer) -> {
+    private void setupRoutes() throws IOException {
+        Routes routes = new Routes(router);
+        routes.configure();
+
+        // Add built-in routes
+        router.addRoute("/test", "GET", (reader, writer) -> {
             try {
-                handleRequest("/", "GET", reader, writer);
+                handleRequest("/test", "GET", reader, writer);
             } catch (ReadFileException e) {
-                LOGGER.error("Error reading file for root path: ", e);
+                LOGGER.error("Error handling request: ", e);
+                writer.writeHeaders("HTTP/1.1 500 Internal Server Error", "Content-Type: text/plain");
+                writer.write("Internal Server Error");
+                writer.flush();
             }
         });
 
-        router.addRoute("/test", "GET", (reader, writer) -> {
-            writer.writeHeaders("HTTP/1.1 200 OK", "Content-Type: text/plain");
-            writer.write("Hello from /test route");
-            writer.flush();
+        router.addRoute("/api/echo", "POST", (reader, writer) -> {
+            try {
+                // Read the headers first
+                String line;
+                int contentLength = 0;
+                while ((line = reader.readLine()) != null && !line.isEmpty()) {
+                    if (line.toLowerCase().startsWith("content-length:")) {
+                        contentLength = Integer.parseInt(line.substring(15).trim());
+                    }
+                }
+
+                // Read the body
+                char[] body = new char[contentLength];
+                reader.read(body, 0, contentLength);
+                String bodyContent = new String(body);
+
+                // Send response with proper HTTP/1.1 format
+                writer.writeHeaders(
+                        "HTTP/1.1 200 OK",
+                        "Content-Type: application/json",
+                        "Content-Length: " + (bodyContent.length() + 35), // Add length of JSON wrapper
+                        "Connection: close");
+                writer.write("{\"status\":\"success\",\"echo\":\"" + bodyContent + "\"}");
+                writer.flush();
+            } catch (IOException | NumberFormatException e) {
+                LOGGER.error("Error handling POST request: ", e);
+                writer.writeHeaders(
+                        "HTTP/1.1 500 Internal Server Error",
+                        "Content-Type: text/plain",
+                        "Connection: close");
+                writer.write("Internal Server Error");
+                writer.flush();
+            }
         });
     }
 
@@ -82,17 +118,30 @@ public final class ServerListenerThread extends Thread {
 
     private void handleRequest(String path, String method, BufferedReader reader, HttpResponseWriter writer)
             throws IOException, ReadFileException {
-        if (path.matches(".*\\.(css|js|png|jpg|jpeg|gif|svg|ico|html)$")) {
-            router.serveStaticFile(path, writer);
-            return;
-        }
+        try {
+            if (path.matches(".*\\.(css|js|png|jpg|jpeg|gif|svg|ico|html)$")) {
+                router.serveStaticFile(path, writer);
+                return;
+            }
 
-        RouteHandler handler = router.getHandler(path, method);
-        if (handler != null) {
-            handler.handle(reader, writer);
-        } else {
-            writer.writeHeaders("HTTP/1.1 404 Not Found", "Content-Type: text/plain");
-            writer.write("Route Not Found");
+            RouteHandler handler = router.getHandler(path, method);
+            if (handler != null) {
+                handler.handle(reader, writer);
+            } else {
+                writer.writeHeaders(
+                        "HTTP/1.1 404 Not Found",
+                        "Content-Type: text/plain",
+                        "Connection: close");
+                writer.write("Route Not Found");
+                writer.flush();
+            }
+        } catch (ReadFileException | IOException e) {
+            LOGGER.error("Error handling request: ", e);
+            writer.writeHeaders(
+                    "HTTP/1.1 500 Internal Server Error",
+                    "Content-Type: text/plain",
+                    "Connection: close");
+            writer.write("Internal Server Error");
             writer.flush();
         }
     }

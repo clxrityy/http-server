@@ -27,6 +27,5 @@ public class Main {
 
         ServerListenerThread serverListenerThread = new ServerListenerThread(config.getPort(), config.getRoot());
         serverListenerThread.start();
-
     }
 }

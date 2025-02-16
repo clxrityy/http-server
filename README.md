@@ -12,7 +12,15 @@ The files in [`root/`](/root/) will be served by the server.
     ```
     - The server will start on port 5006 by default ([`http://localhost:5006`](http://localhost:5006))
     - The server will serve files from the `root` directory by default
-    - The server will use the `http.json` file by default
+    - The server will use the `http.json` file as the config by default
+
+Test the `api/echo` route:
+```zsh
+curl -v \        
+  -H "Content-Type: application/json" \
+  -d '{"message":"hello"}' \
+  http://localhost:5006/api/echo
+```
 
 ## Features
 
@@ -24,10 +32,10 @@ The files in [`root/`](/root/) will be served by the server.
     - [x] Support for JS files
     - [x] Support for HTML files
     - [x] Support for image files
-- [ ] Support for routes
-- [ ] Support for different HTTP methods
+- [x] Support for routes
+- [x] Support for different HTTP methods
     - [x] GET
-    - [ ] POST
+    - [x] POST
     - [ ] PUT
     - [ ] DELETE
     - [ ] PATCH
