@@ -33,7 +33,12 @@ public class HttpConnectionWorker extends Thread {
         if (notFoundPage.exists()) {
             sendFileResponse(out, "404 Not Found", notFoundPage, "text/html");
         } else {
-            sendResponse(out, "404 Not Found", "<h1>404 Not Found</h1>");
+            try {
+                notFoundPage.createNewFile();
+                sendFileResponse(out, "404 Not Found", notFoundPage, "text/html");
+            } catch (IOException e) {
+                LOGGER.error("Problem with creating 404.html", e);
+            }
         }
     }
 
@@ -60,7 +65,6 @@ public class HttpConnectionWorker extends Thread {
             return baos.toByteArray();
         }
     }
-
 
     private String getContentType(String fileName) {
         if (fileName.endsWith(".html")) {
@@ -98,13 +102,13 @@ public class HttpConnectionWorker extends Thread {
         } else {
             return "application/octet-stream"; // Default binary type
         }
-    }    
+    }
 
     @Override
     public void run() {
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-             OutputStream out = socket.getOutputStream()) {
+                OutputStream out = socket.getOutputStream()) {
             // Read the request line (e.g., "GET / HTTP/1.1")
             String requestLine = reader.readLine();
 
@@ -114,7 +118,7 @@ public class HttpConnectionWorker extends Thread {
 
             LOGGER.info("REQUEST: " + requestLine);
             String[] requestParts = requestLine.split(" ");
-            if (requestParts.length < 2 || !requestParts[0].equalsIgnoreCase("GET")) {
+            if (requestParts.length < 2 || !requestParts[0].equalsIgnoreCase("GET") || !requestParts[2].equalsIgnoreCase("HTTP/1.1")) {
                 sendResponse(out, "HTTP/1.1 400 Bad Request", "Invalid request method or format.");
                 return;
             }

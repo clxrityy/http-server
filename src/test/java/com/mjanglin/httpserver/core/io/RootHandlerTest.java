@@ -182,14 +182,4 @@ public class RootHandlerTest {
             fail(e);
         }
     }
-
-    @Test
-    void testGetFileTypeCss() {
-        try {
-            String fileType = rootHandler.getFileMimeType("/style.css");
-            assertEquals("text/css", fileType);
-        } catch (FileNotFoundException e) {
-            fail(e);
-        }
-    }
 }

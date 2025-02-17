@@ -1,6 +1,9 @@
 package com.mjanglin.httpserver.core;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
 public class DefaultHttpResponseWriter implements HttpResponseWriter {
     private final BufferedWriter writer;
