@@ -6,8 +6,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLConnection;
 
+import com.mjanglin.httpserver.config.MimeTypes;
+
 public class RootHandler {
-    private File root;
+    private final File root;
+    private final MimeTypes mimeTypes = new MimeTypes();
 
     public RootHandler(String rootPath) throws RootNotFoundException {
         root = new File(rootPath);
@@ -24,9 +27,9 @@ public class RootHandler {
     /**
      * This method checks to see if the relative path provided exists inside root
      */
-     private boolean checkIfProvidedRelativePathExistsInsideRoot(String relativePath) {
+    private boolean checkIfProvidedRelativePathExistsInsideRoot(String relativePath) {
         File file = new File(root, relativePath);
-        
+
         if (!file.exists()) {
             return false;
         }
@@ -34,6 +37,12 @@ public class RootHandler {
         try {
             if (file.getCanonicalPath().startsWith(root.getCanonicalPath())) {
                 return true;
+            } else if (file.isDirectory()) {
+                file = new File(file, "index.html");
+
+                if (file.exists()) {
+                    return true;
+                }
             }
         } catch (IOException e) {
             return false;
@@ -48,17 +57,21 @@ public class RootHandler {
         }
 
         if (!checkIfProvidedRelativePathExistsInsideRoot(relativePath)) {
-            throw new FileNotFoundException("File not found: " + relativePath);
+            
         }
 
         File file = new File(root, relativePath);
 
         String mimeType = URLConnection.getFileNameMap().getContentTypeFor(file.getName());
 
+        String fileName = file.getName();
+
+        mimeType = mimeTypes.getMimeType(fileName);
+
         if (mimeType == null) {
-            mimeType = "application/octet-stream"; /**
-                https://datatracker.ietf.org/doc/html/rfc7231
-            */
+            return "application/octet-stream"; /**
+                                                * https://datatracker.ietf.org/doc/html/rfc7231
+                                                */
         }
 
         return mimeType;
@@ -86,7 +99,7 @@ public class RootHandler {
 
         File file = new File(root, relativePath);
         FileInputStream fileInputStream = new FileInputStream(file);
-        byte[] fileBytes = new byte[(int)file.length()];
+        byte[] fileBytes = new byte[(int) file.length()];
 
         try {
             fileInputStream.read(fileBytes);

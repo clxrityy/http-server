@@ -28,15 +28,11 @@ public final class ServerListenerThread extends Thread {
     private final Router router;
 
     public ServerListenerThread(int prt, String wr) throws IOException, RootNotFoundException {
-        // if (wr == null) {
-
-        // }
-
         this.port = prt;
         this.webroot = wr;
         this.serverSocket = new ServerSocket(this.port);
         this.rootHandler = new RootHandler(this.webroot);
-        this.router = new Router(); // Pass webroot to Router
+        this.router = new Router(wr); // Pass webroot to Router
         this.threadPool = new ThreadPoolExecutor(
                 5, // Core pool size (minimum threads always running)
                 50, // Maximum pool size (upper limit for simultaneous requests)

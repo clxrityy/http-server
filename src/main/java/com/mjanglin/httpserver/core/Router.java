@@ -16,13 +16,13 @@ import com.mjanglin.httpserver.core.io.RootNotFoundException;
 public class Router {
     private final Map<String, RouteHandler> getRoutes = new HashMap<>();
     private final Map<String, RouteHandler> postRoutes = new HashMap<>();
-    private final String staticFileDirectory = "root"; // Change this to your actual static files directory
+    private final String staticFileDirectory; // Change this to your actual static files directory
     private final RootHandler rootHandler;
     private final static Logger LOGGER = LoggerFactory.getLogger(Router.class);
-    
 
-    public Router() throws IOException, RootNotFoundException {
-        this.rootHandler = new RootHandler(staticFileDirectory);
+    public Router(String rootPath) throws IOException, RootNotFoundException {
+        this.staticFileDirectory = rootPath;
+        this.rootHandler = new RootHandler(this.staticFileDirectory);
     }
 
     public String getRoot() {
@@ -51,7 +51,7 @@ public class Router {
     public void handleRequest(String path, String method, BufferedReader reader, HttpResponseWriter writer)
             throws IOException, ReadFileException {
         // Check if it's a static file request (CSS, JS, images, etc.)
-        if (path.matches(".*\\.(css|js|png|jpg|jpeg|gif|svg|ico)$")) {
+        if (path.matches(".*\\.(css|js|png|jpg|jpeg|gif|svg|ico|json|txt|svg|wav|mp3|webmanifest)$")) {
             serveStaticFile(path, writer);
             return;
         }
@@ -67,24 +67,36 @@ public class Router {
     }
 
     public void serveStaticFile(String path, HttpResponseWriter writer) throws IOException, ReadFileException {
-        File file = new File(path);
-    
+        // Remove leading slash if present and combine with root directory
+        String cleanPath = path.startsWith("/") ? path.substring(1) : path;
+        File file = new File(staticFileDirectory, cleanPath);
+
+        // DEBUG LOGGING
+        LOGGER.debug("Attempting to serve static file: " + file.getAbsolutePath());
+        LOGGER.debug("File exists: " + file.exists());
+        LOGGER.debug("Is file: " + file.isFile());
+
         if (!file.exists() || !file.isFile()) {
             LOGGER.info("File not found: " + file.getAbsolutePath());
             writer.writeHeaders("HTTP/1.1 404 Not Found", "Content-Type: text/plain");
             writer.write("404 Not Found");
             return;
         }
-    
-        String contentType = rootHandler.getFileMimeType(path);
-        byte[] fileBytes = rootHandler.getFileByteArrayData(path);
-    
+
+        String contentType = rootHandler.getFileMimeType(cleanPath);
+        byte[] fileBytes = rootHandler.getFileByteArrayData(cleanPath);
+
+        // DEBUG LOGGING
+        LOGGER.debug("Content-Type determined: " + contentType);
+        LOGGER.debug("File size: " + fileBytes.length);
+
+        contentType = rootHandler.getFileMimeType(file.getAbsolutePath());
+
         writer.writeHeaders(
-            "HTTP/1.1 200 OK",
-            "Content-Type: " + contentType,
-            "Content-Length: " + fileBytes.length
-        );
-        writer.write(fileBytes);
+                "HTTP/1.1 200 OK",
+                "Content-Type: " + contentType,
+                "Content-Length: " + fileBytes.length);
+        writer.write(new String(fileBytes));
         writer.flush();
     }
 }
