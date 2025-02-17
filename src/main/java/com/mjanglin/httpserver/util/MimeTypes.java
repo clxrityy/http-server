@@ -1,4 +1,4 @@
-package com.mjanglin.httpserver.config;
+package com.mjanglin.httpserver.util;
 
 import java.util.HashMap;
 import java.util.Map;

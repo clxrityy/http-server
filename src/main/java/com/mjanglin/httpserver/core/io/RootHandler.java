@@ -4,9 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URLConnection;
 
-import com.mjanglin.httpserver.config.MimeTypes;
+import com.mjanglin.httpserver.util.MimeTypes;
 
 public class RootHandler {
     private final File root;
@@ -62,11 +61,9 @@ public class RootHandler {
 
         File file = new File(root, relativePath);
 
-        String mimeType = URLConnection.getFileNameMap().getContentTypeFor(file.getName());
-
         String fileName = file.getName();
 
-        mimeType = mimeTypes.getMimeType(fileName);
+        String mimeType = mimeTypes.getMimeType(fileName);
 
         if (mimeType == null) {
             return "application/octet-stream"; /**

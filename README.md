@@ -12,7 +12,7 @@ The files in [`root/`](/root/) will be served by the server.
     ```
     - The server will start on port 5006 by default ([`http://localhost:5006`](http://localhost:5006))
     - The server will serve files from the `root` directory by default
-    - The server will use the `http.json` file as the config by default
+    - The server will use the [`config.json`](/src/main/resources/config.json) file as the config by default
 
 Test the `api/echo` route:
 ```zsh

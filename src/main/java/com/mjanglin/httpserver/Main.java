@@ -18,7 +18,7 @@ public class Main {
     public static void main(String[] args) throws IOException, RootNotFoundException {
         LOGGER.info("Server starting...");
 
-        ConfigManager.getInstance().loadConfig("src/main/resources/http.json");
+        ConfigManager.getInstance().loadConfig("src/main/resources/config.json");
         Config config = ConfigManager.getInstance().getCurrentConfig();
 
         LOGGER.info("Using port: " + config.getPort());
